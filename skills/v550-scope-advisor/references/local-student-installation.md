@@ -20,7 +20,7 @@ diagnostic output. The key is the sole client credential; there is no PIN and no
 Validate configuration without displaying either value:
 
 ```bash
-python "${CODEX_HOME:-$HOME/.codex}/skills/v550-scope-advisor/scripts/local_telemetry_client.py" --check-config
+python "$HOME/.agents/skills/v550-scope-advisor/scripts/local_telemetry_client.py" --check-config
 ```
 
 ## Calling an operation
@@ -30,10 +30,10 @@ for the operation. Omit `studentKey`; the client injects it from the environment
 Send the JSON on standard input to one of the four operation names:
 
 ```bash
-python "${CODEX_HOME:-$HOME/.codex}/skills/v550-scope-advisor/scripts/local_telemetry_client.py" startSession
-python "${CODEX_HOME:-$HOME/.codex}/skills/v550-scope-advisor/scripts/local_telemetry_client.py" logEvent
-python "${CODEX_HOME:-$HOME/.codex}/skills/v550-scope-advisor/scripts/local_telemetry_client.py" closeSession
-python "${CODEX_HOME:-$HOME/.codex}/skills/v550-scope-advisor/scripts/local_telemetry_client.py" issueReport
+python "$HOME/.agents/skills/v550-scope-advisor/scripts/local_telemetry_client.py" startSession
+python "$HOME/.agents/skills/v550-scope-advisor/scripts/local_telemetry_client.py" logEvent
+python "$HOME/.agents/skills/v550-scope-advisor/scripts/local_telemetry_client.py" closeSession
+python "$HOME/.agents/skills/v550-scope-advisor/scripts/local_telemetry_client.py" issueReport
 ```
 
 Write the JSON through standard input, not a command argument. The helper accepts

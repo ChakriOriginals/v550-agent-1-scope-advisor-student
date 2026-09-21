@@ -10,7 +10,7 @@ For complete macOS, Linux, and Windows instructions, read
 
 ## What you need
 
-- Codex installed on your computer;
+- ChatGPT Desktop with Codex, or the Codex CLI, installed on your computer;
 - Python 3.11 or newer;
 - `curl`, included with current macOS, Windows, and most Linux systems;
 - your individual V550 student key from the instructor.
@@ -26,8 +26,9 @@ Clone this repository, enter its directory, and run:
 python3 install.py
 ```
 
-The installer copies only `v550-scope-advisor` into your Codex skills folder. It
-never asks for or stores your student key.
+The installer copies only `v550-scope-advisor` into the documented user skill
+folder at `~/.agents/skills`. ChatGPT Desktop and Codex discover it there. The
+installer never asks for or stores your student key.
 
 Verify the downloaded package before installing or updating it:
 
@@ -35,7 +36,31 @@ Verify the downloaded package before installing or updating it:
 python3 tools/verify_package.py
 ```
 
-## Start a practice session
+## Start in ChatGPT Desktop on macOS
+
+Completely quit ChatGPT, then run:
+
+```bash
+./start-v550-desktop.sh
+```
+
+Enter your individual key at the hidden prompt. The launcher validates the
+configuration, starts ChatGPT Desktop with the key available only to that app
+process, and does not save the key. In ChatGPT Desktop, select **Codex**, open
+this repository as a local folder, open **Skills** in the sidebar, and confirm
+**v550 Scope Advisor** is listed. Start a local Codex chat and select the skill
+by typing `$v550-scope-advisor`.
+
+Use this prompt:
+
+```text
+Use $v550-scope-advisor to help me practice Stage 1 Scope of Work in Guided mode.
+```
+
+If ChatGPT was already running, the launcher stops before asking for a key. Quit
+the app fully and rerun it so the new process receives the temporary credential.
+
+## Start in Codex CLI
 
 On macOS or Linux, run:
 
@@ -60,9 +85,9 @@ you decline, practice can continue without telemetry. The advisor logs structure
 course activity and short sanitized summaries, not transcripts, full drafts,
 personal information, sensitive details, secrets, or grades.
 
-## Windows or Codex Desktop
+## Windows
 
-If you cannot use the launcher, set `V550_ACTION_ENDPOINT` and
+If you cannot use the macOS launchers, set `V550_ACTION_ENDPOINT` and
 `V550_STUDENT_KEY` in the environment that launches Codex. Do not put the key in
 the prompt, a command argument, a Git file, or a Living Project File. Ask your
 instructor or TA for local setup help if your installation does not inherit those
@@ -85,6 +110,9 @@ limited to the named instructors and TAs.
   CLI, then rerun the launcher. The launcher checks the standard macOS app bundle
   even when Terminal does not include it in `PATH`.
 - Existing skill folder: move the old folder aside, then rerun `python3 install.py`.
+- Skill missing in ChatGPT Desktop: confirm it exists at
+  `~/.agents/skills/v550-scope-advisor`, then quit and reopen the app with
+  `./start-v550-desktop.sh`.
 
 Do not submit real personal, medical, financial, disciplinary, immigration,
 authentication, disability, security, or other sensitive information to the

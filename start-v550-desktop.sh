@@ -17,45 +17,34 @@ resolve_client_path() {
   return 1
 }
 
-resolve_codex_cli() {
-  if [ -n "${V550_CODEX_CLI:-}" ]; then
-    if [ -x "$V550_CODEX_CLI" ]; then
-      printf '%s\n' "$V550_CODEX_CLI"
+resolve_desktop_executable() {
+  if [ -n "${V550_CHATGPT_EXECUTABLE:-}" ]; then
+    if [ -x "$V550_CHATGPT_EXECUTABLE" ]; then
+      printf '%s\n' "$V550_CHATGPT_EXECUTABLE"
       return 0
     fi
-    echo "V550_CODEX_CLI does not point to an executable Codex CLI." >&2
+    echo "V550_CHATGPT_EXECUTABLE does not point to an executable app." >&2
     return 1
   fi
 
-  if command -v codex >/dev/null 2>&1; then
-    command -v codex
-    return 0
-  fi
-
   for candidate in \
-    "/Applications/ChatGPT.app/Contents/Resources/codex" \
-    "$HOME/Applications/ChatGPT.app/Contents/Resources/codex" \
-    "/Applications/Codex.app/Contents/Resources/codex" \
-    "$HOME/Applications/Codex.app/Contents/Resources/codex" \
-    "$HOME/.local/bin/codex" \
-    "/opt/homebrew/bin/codex" \
-    "/usr/local/bin/codex"
+    "/Applications/ChatGPT.app/Contents/MacOS/ChatGPT" \
+    "$HOME/Applications/ChatGPT.app/Contents/MacOS/ChatGPT"
   do
     if [ -x "$candidate" ]; then
       printf '%s\n' "$candidate"
       return 0
     fi
   done
-
   return 1
 }
 
-if [ "${1:-}" = "--check-cli" ]; then
-  if resolve_codex_cli >/dev/null; then
-    echo "Codex CLI detected."
+if [ "${1:-}" = "--check-desktop" ]; then
+  if resolve_desktop_executable >/dev/null; then
+    echo "ChatGPT Desktop detected."
     exit 0
   fi
-  echo "Codex CLI was not found in PATH or the installed ChatGPT/Codex app." >&2
+  echo "ChatGPT Desktop was not found in a standard macOS application location." >&2
   exit 2
 fi
 
@@ -64,19 +53,24 @@ if [ ! -f "$endpoint_file" ]; then
   exit 2
 fi
 
-V550_ACTION_ENDPOINT=$(sed -n '1p' "$endpoint_file")
-export V550_ACTION_ENDPOINT
-
 if ! client_path=$(resolve_client_path); then
   echo "The V550 skill is not installed. Run: python3 install.py" >&2
   exit 2
 fi
 
-if ! codex_cli=$(resolve_codex_cli); then
-  echo "Codex CLI was not found in PATH or the installed ChatGPT/Codex app." >&2
-  echo "Install the Codex CLI, or ask the instructor or TA for setup help." >&2
+if ! desktop_executable=$(resolve_desktop_executable); then
+  echo "ChatGPT Desktop was not found. Install or update the macOS app first." >&2
   exit 2
 fi
+
+if [ -z "${V550_CHATGPT_EXECUTABLE:-}" ] && pgrep -x ChatGPT >/dev/null 2>&1; then
+  echo "ChatGPT Desktop is already running." >&2
+  echo "Choose ChatGPT > Quit ChatGPT, then rerun this launcher so the app inherits your private V550 key." >&2
+  exit 2
+fi
+
+V550_ACTION_ENDPOINT=$(sed -n '1p' "$endpoint_file")
+export V550_ACTION_ENDPOINT
 
 trap 'unset V550_STUDENT_KEY V550_ACTION_ENDPOINT; stty echo 2>/dev/null || true' 0 HUP INT TERM
 
@@ -95,5 +89,8 @@ export V550_STUDENT_KEY
 
 python3 "$client_path" --check-config
 
+echo "Opening ChatGPT Desktop with temporary V550 credentials."
+echo "In the app, open this folder: $package_dir"
+echo 'Select Codex, start a local chat, and invoke $v550-scope-advisor.'
 cd "$package_dir"
-exec "$codex_cli"
+exec "$desktop_executable"

@@ -15,6 +15,7 @@ REQUIRED = (
     ROOT / "SECURITY.md",
     ROOT / "install.py",
     ROOT / "start-v550.sh",
+    ROOT / "start-v550-desktop.sh",
     ROOT / "config" / "endpoint.txt",
     ROOT / "skills" / "v550-scope-advisor" / "SKILL.md",
     ROOT

@@ -13,6 +13,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 LAUNCHER = ROOT / "start-v550.sh"
+DESKTOP_LAUNCHER = ROOT / "start-v550-desktop.sh"
 CLIENT = ROOT / "skills" / "v550-scope-advisor" / "scripts" / "local_telemetry_client.py"
 ENDPOINT = (ROOT / "config" / "endpoint.txt").read_text(encoding="utf-8").strip()
 
@@ -117,6 +118,69 @@ class StartV550LauncherTests(unittest.TestCase):
         self.assertEqual(completed.returncode, 2, rendered)
         self.assertIn("does not point to an executable", rendered)
         self.assertNotIn("V550 student key (input hidden)", rendered)
+
+    def test_desktop_launcher_syntax_and_standard_app_location(self) -> None:
+        completed = subprocess.run(
+            ["sh", "-n", str(DESKTOP_LAUNCHER)],
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        source = DESKTOP_LAUNCHER.read_text(encoding="utf-8")
+        self.assertIn("/Applications/ChatGPT.app/Contents/MacOS/ChatGPT", source)
+        self.assertLess(
+            source.index("if ! desktop_executable=$(resolve_desktop_executable)"),
+            source.index("V550 student key (input hidden)"),
+        )
+
+    def test_desktop_launcher_passes_temporary_credentials_without_echoing(self) -> None:
+        synthetic_key = "V550_" + "SYNTH_DESKTOP_TEST_" + "1234567890"
+        with tempfile.TemporaryDirectory() as temporary:
+            temp = Path(temporary)
+            client_target = (
+                temp
+                / ".agents"
+                / "skills"
+                / "v550-scope-advisor"
+                / "scripts"
+                / "local_telemetry_client.py"
+            )
+            client_target.parent.mkdir(parents=True)
+            shutil.copy2(CLIENT, client_target)
+
+            fake_desktop = temp / "ChatGPT"
+            fake_desktop.write_text(
+                "#!/bin/sh\n"
+                f"[ \"${{V550_STUDENT_KEY:-}}\" = \"{synthetic_key}\" ] || exit 51\n"
+                f"[ \"${{V550_ACTION_ENDPOINT:-}}\" = \"{ENDPOINT}\" ] || exit 52\n"
+                "printf 'FAKE_DESKTOP_STARTED\\n'\n",
+                encoding="utf-8",
+            )
+            fake_desktop.chmod(fake_desktop.stat().st_mode | stat.S_IXUSR)
+
+            environment = os.environ.copy()
+            environment.update(
+                {
+                    "HOME": str(temp),
+                    "V550_CHATGPT_EXECUTABLE": str(fake_desktop),
+                    "V550_STUDENT_KEY": synthetic_key,
+                }
+            )
+            completed = subprocess.run(
+                [str(DESKTOP_LAUNCHER)],
+                cwd=ROOT,
+                env=environment,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+        rendered = completed.stdout + completed.stderr
+        self.assertEqual(completed.returncode, 0, rendered)
+        self.assertIn("FAKE_DESKTOP_STARTED", rendered)
+        self.assertIn('"studentKeyPresent": true', rendered)
+        self.assertNotIn(synthetic_key, rendered)
 
 
 if __name__ == "__main__":

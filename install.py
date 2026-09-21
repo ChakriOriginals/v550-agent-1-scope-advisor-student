@@ -15,8 +15,10 @@ SOURCE = ROOT / "skills" / "v550-scope-advisor"
 
 
 def target_root() -> Path:
-    configured = os.environ.get("CODEX_HOME")
-    return Path(configured).expanduser() if configured else Path.home() / ".codex"
+    """Return the documented per-user skill directory for ChatGPT and Codex."""
+
+    configured = os.environ.get("V550_SKILLS_HOME")
+    return Path(configured).expanduser() if configured else Path.home() / ".agents" / "skills"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -25,7 +27,7 @@ def main(argv: list[str] | None = None) -> int:
     if not (SOURCE / "SKILL.md").is_file():
         print("Install failed: bundled skill is incomplete.", file=sys.stderr)
         return 2
-    destination = target_root() / "skills" / "v550-scope-advisor"
+    destination = target_root() / "v550-scope-advisor"
     if destination.exists():
         print(
             f"Install stopped: {destination} already exists. Move the old folder "

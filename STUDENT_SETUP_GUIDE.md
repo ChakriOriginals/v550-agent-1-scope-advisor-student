@@ -13,7 +13,7 @@ You need:
 - Git;
 - Python 3.11 or newer;
 - `curl`;
-- the Codex CLI.
+- the ChatGPT desktop app or Codex CLI.
 
 Check the required programs:
 
@@ -21,7 +21,6 @@ Check the required programs:
 git --version
 python3 --version
 curl --version
-codex --version
 ```
 
 If one of these commands is unavailable, contact the instructor or TA before
@@ -38,6 +37,15 @@ cd v550-agent-1-scope-advisor-student
 
 GitHub may ask you to sign in because this is a private course repository.
 
+On macOS, confirm at least one launch surface is available:
+
+```bash
+./start-v550-desktop.sh --check-desktop
+./start-v550.sh --check-cli
+```
+
+You only need one of these checks to pass.
+
 ### 2. Verify the package
 
 ```bash
@@ -52,15 +60,45 @@ Continue only when the command reports `STUDENT PACKAGE CHECK PASSED`.
 python3 install.py
 ```
 
-The installer copies the skill into:
+The installer copies the skill into the documented user skill folder:
 
 ```text
-~/.codex/skills/v550-scope-advisor
+~/.agents/skills/v550-scope-advisor
 ```
 
 It does not ask for or save your student key.
 
-### 4. Start Codex for V550 practice
+### 4A. Start ChatGPT Desktop for V550 practice on macOS
+
+First choose **ChatGPT > Quit ChatGPT** so no existing app process remains. Then
+run:
+
+```bash
+./start-v550-desktop.sh
+```
+
+Enter your individual student key at the hidden prompt. Nothing will appear while
+you type. Press Enter when finished. The launcher starts a new ChatGPT Desktop
+process with the key and endpoint in that process environment only. It does not
+write the key to disk.
+
+In ChatGPT Desktop:
+
+1. Select **Codex**, choose **Open folder**, and select this cloned repository.
+2. Open **Skills** in the sidebar and confirm **v550 Scope Advisor** is listed.
+3. Start a local Codex chat and type `$` to select `v550-scope-advisor`.
+4. Send:
+
+```text
+Use $v550-scope-advisor to help me practice Stage 1 Scope of Work in Guided mode.
+```
+
+The advisor will explain the limited telemetry and ask for consent before its
+first write. You may decline telemetry and continue practicing locally. Keep the
+Terminal window open while using this specially launched app, and quit ChatGPT
+when the V550 practice session is finished.
+
+### 4B. Start Codex CLI for V550 practice
 
 ```bash
 ./start-v550.sh
@@ -109,13 +147,13 @@ try {
 } finally {
     [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($keyPointer)
 }
-python "$env:USERPROFILE\.codex\skills\v550-scope-advisor\scripts\local_telemetry_client.py" --check-config
+python "$env:USERPROFILE\.agents\skills\v550-scope-advisor\scripts\local_telemetry_client.py" --check-config
 codex
 Remove-Item Env:V550_STUDENT_KEY, Env:V550_ACTION_ENDPOINT -ErrorAction SilentlyContinue
 ```
 
-Then use the same advisor prompt shown above. Run Codex from this PowerShell
-window; an already-running Codex Desktop session will not inherit these temporary
+Then use the CLI advisor prompt shown above. Run Codex from this PowerShell
+window; an already-running ChatGPT Desktop session will not inherit these temporary
 environment variables.
 
 ## What telemetry contains
@@ -163,14 +201,14 @@ then rerun the installer.
 macOS or Linux:
 
 ```bash
-mv "$HOME/.codex/skills/v550-scope-advisor" "$HOME/.codex/skills/v550-scope-advisor.backup"
+mv "$HOME/.agents/skills/v550-scope-advisor" "$HOME/.agents/skills/v550-scope-advisor.backup"
 python3 install.py
 ```
 
 Windows PowerShell:
 
 ```powershell
-Rename-Item "$env:USERPROFILE\.codex\skills\v550-scope-advisor" "v550-scope-advisor.backup"
+Rename-Item "$env:USERPROFILE\.agents\skills\v550-scope-advisor" "v550-scope-advisor.backup"
 python install.py
 ```
 
@@ -199,6 +237,30 @@ You can check CLI discovery without entering a student key:
 ```bash
 ./start-v550.sh --check-cli
 ```
+
+### ChatGPT Desktop says it is already running
+
+Choose **ChatGPT > Quit ChatGPT**, wait for the app to close, and rerun:
+
+```bash
+./start-v550-desktop.sh
+```
+
+The launcher deliberately refuses to reuse an already-running app because that
+process would not inherit the temporary student key.
+
+### The skill is not visible in ChatGPT Desktop
+
+Confirm the install exists, then quit and relaunch the app:
+
+```bash
+test -f "$HOME/.agents/skills/v550-scope-advisor/SKILL.md" && echo "Skill installed"
+./start-v550-desktop.sh
+```
+
+Open **Skills** in the sidebar after the repository folder is open. In a local
+Codex chat or Codex CLI, type `$` to select the skill; in the CLI you can also
+run `/skills`.
 
 ## Updating later
 
