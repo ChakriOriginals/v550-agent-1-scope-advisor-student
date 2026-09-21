@@ -45,7 +45,9 @@ On macOS or Linux, run:
 
 The launcher reads the instructor endpoint from `config/endpoint.txt`, privately
 prompts for your student key, validates the configuration without printing either
-value, and starts Codex with the values available only to that process.
+value, and starts Codex with the values available only to that process. It detects
+the Codex CLI in `PATH` and in the standard ChatGPT or Codex application bundle on
+macOS.
 
 Then prompt Codex:
 
@@ -79,6 +81,9 @@ limited to the named instructors and TAs.
   student-callable; continue practice locally and notify the instructor.
 - Telemetry unavailable: the advisor must not claim a dashboard write occurred.
   Your local practice and Markdown checkpoint can continue.
+- Codex CLI not found: update to the latest ChatGPT/Codex app or install the Codex
+  CLI, then rerun the launcher. The launcher checks the standard macOS app bundle
+  even when Terminal does not include it in `PATH`.
 - Existing skill folder: move the old folder aside, then rerun `python3 install.py`.
 
 Do not submit real personal, medical, financial, disciplinary, immigration,

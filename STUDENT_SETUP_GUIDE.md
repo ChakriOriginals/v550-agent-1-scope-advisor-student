@@ -68,7 +68,9 @@ It does not ask for or save your student key.
 
 Enter your individual student key at the hidden prompt. Nothing will appear while
 you type. Press Enter when finished. The key exists only in the launched process
-and is not written to the repository.
+and is not written to the repository. On macOS, the launcher also detects the
+Codex CLI bundled inside the standard ChatGPT or Codex application even when it is
+missing from Terminal's `PATH`.
 
 ### 5. Start the advisor
 
@@ -185,6 +187,19 @@ was updated unless the server returned a successful acknowledgement.
 Stop the telemetry attempt and notify the instructor or TA. Your local practice and
 Markdown checkpoint can continue.
 
+### `Codex CLI was not found`
+
+Update to the latest ChatGPT/Codex app or install the Codex CLI, then rerun
+`./start-v550.sh`. The launcher checks both Terminal's `PATH` and the standard
+macOS application locations. If the message continues, send the error text to the
+instructor or TA; do not send your student key.
+
+You can check CLI discovery without entering a student key:
+
+```bash
+./start-v550.sh --check-cli
+```
+
 ## Updating later
 
 From the repository folder:
@@ -197,4 +212,3 @@ python3 tools/verify_package.py
 Move the installed skill aside as described above, then run the installer again.
 Never overwrite or delete an existing skill folder unless the instructor or TA has
 confirmed the update procedure.
-
