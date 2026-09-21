@@ -1,6 +1,6 @@
 # V550 Course Concept Source Map
 
-Version: 2026-08-26-final-build  
+Version: 2026-08-26-final-build
 Purpose: private build and retrieval evidence. This map supplies locators, not course answers. Runtime teaching and evaluation must retrieve the listed local source before making a factual or method claim.
 
 ## Source authority
