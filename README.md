@@ -5,6 +5,9 @@ Codex skill. The advisor coaches you through six Scope of Work gates, preserves
 your draft fragments, and evaluates a gate only after you say you are ready.
 It does not write the assignment for you or assign a Canvas grade.
 
+For complete macOS, Linux, and Windows instructions, read
+[`STUDENT_SETUP_GUIDE.md`](STUDENT_SETUP_GUIDE.md).
+
 ## What you need
 
 - Codex installed on your computer;
