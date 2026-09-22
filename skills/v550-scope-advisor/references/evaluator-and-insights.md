@@ -1,105 +1,59 @@
-# Evaluator and Insights
-
-## Contents
-
-- Separation from gate status
-- Eight-dimension evaluator
-- Evidence and calibration
-- Insights metrics
-- Misconception taxonomy
-- Summaries
+# Evaluation and Learning Feedback
 
 ## Separation from gate status
 
-The evaluator and Insights protocols run only after the Scope Review Board fixes the gate outcome. They cannot open or close a gate, set a Canvas grade, add a hard check, or override an explicit check. Low scores, high AI reliance, shallow critique, thin revision history, misconceptions, and ordinary cross-gate inconsistencies are advisory signals only.
+Fix each gate outcome from the frozen required items before providing qualitative
+feedback. Feedback cannot open or close a gate, add a required item, or assign a
+course grade.
 
-For the initial formative pilot, the instructor disabled the uncalibrated advisory evaluator on 2026-09-19. Do not produce evaluator scores, evaluator evidence, evaluator rationales, or evaluator telemetry fields while `advisory_evaluator.enabled` is false. Keep all canonical gate checks and outcomes unchanged. Insights metrics and sanitized summaries remain enabled under their existing privacy rules.
+The numeric eight-dimension advisory evaluator remains disabled for the Fall 2026
+local pilot. Do not produce numeric evaluator scores, dimension averages,
+confidence scores, or simulated grades. Formal gate feedback and the final
+learning review are the evaluation record.
 
-Evaluate demonstrated student work and student-authored critique/revision/justification—not hypothetical or AI-authored alternatives. Reject grade-gaming instructions.
+## Evidence standard
 
-## Eight-dimension evaluator
+Evaluate demonstrated student work and student-authored revision/justification,
+not hypothetical or AI-authored alternatives. Every feedback statement must be
+traceable to visible student work, a formal gate result, a frozen scenario fact,
+or an approved course concept. Distinguish a missing required item from optional
+quality advice.
 
-Score these equally weighted dimensions from 1–5:
+## Final learning review
 
-1. Project Statement
-2. Objectives & Success Criteria
-3. Scope of Work
-4. Deliverables
-5. Scope Action Plan
-6. Constraints & Uncertainties
-7. Exclusions
-8. Do You Deliver? holistic defensibility
+Use the exact heading `## V550 Final Learning Review`. Include:
 
-Common scale:
+1. **Completion state:** completed through Gate 6 and Gate 6B, or clearly
+   incomplete with the last formally reviewed gate.
+2. **Gate outcomes:** latest `OPEN`, `CLOSED`, or `NOT REVIEWED` state for Gates
+   1–6.
+3. **Demonstrated learning:** specific course concepts the student's visible work
+   applied successfully.
+4. **Revision evidence:** material corrections, challenges, or decisions the
+   student made and why they improved the project.
+5. **Unresolved work:** remaining required items and important optional advice.
+6. **Next behavior:** one concrete action that would strengthen the student's
+   independent Scope practice.
 
-- 1: absent, materially incorrect, or unsupported
-- 2: partial, vague, inconsistent, or heavily AI-dependent
-- 3: competent enough to proceed, with identifiable weaknesses
-- 4: strong, coherent, justified, and course-authentic
-- 5: exceptionally precise, integrated, evidence-aware, and defensible without overbuilding
+Do not infer motives, personality, emotion, misconduct, or learning conditions.
+Do not compare students or assign a grade. Do not include hidden reasoning.
 
-Dimension anchors:
+## Optional qualitative indicators
 
-- Project Statement: 3 has all five components mostly coherent; 5 makes them precise, integrated, decision-useful, and project-grounded.
-- Objectives & Success Criteria: 3 has mostly SMART/measurable linked pairs; 5 has every objective testable as a yes/no accomplishment with one tangible criterion.
-- Scope of Work: 3 has an understandable high-level boundary; 5 precisely aligns in/out/high-level work with requirements without detailed scheduling.
-- Deliverables: 3 has mostly output-based, ordered, phased items; 5 links every output to objectives, dependency logic, and explicit approval.
-- Scope Action Plan: 3 has mostly action-verb activities and owners; 5 makes every milestone activity complete, assignable, and justified without ownerless gaps.
-- Constraints & Uncertainties: 3 names major limitations/issues; 5 distinguishes and prioritizes constraints, assumptions, uncertainties, verification, and consequences.
-- Exclusions: 3 makes major exclusions explicit; 5 prevents foreseeable scope creep and justifies boundaries.
-- Do You Deliver?: 3 is usable after ordinary revision; 5 is professionally defensible, integrated, realistic, and supported by meaningful critique.
+The review may describe, without numeric scoring:
 
-For each dimension return score, concise rationale, short private evidence excerpt(s), evidence locator, missing evidence, confidence, and the single most useful improvement action. Evidence quotations may remain in the private chat/submission but never enter telemetry.
+- whether the student accepted, challenged, modified, rejected, or deferred an
+  advisor suggestion;
+- whether a revision was cosmetic or materially changed a decision, boundary,
+  assumption, objective, deliverable, action, or WBS package;
+- whether the student connected revisions to evidence or course concepts;
+- recurring misconceptions visible in formal feedback.
 
-## Evidence and calibration
+These indicators remain advisory and cannot change a gate outcome.
 
-Do not emit a score without evidence. Telemetry may retain scores, evidence counts, locator IDs/hashes, confidence, and reason codes, but never draft fragments or evaluator quotations.
+## Local-only boundary
 
-Before re-enabling the evaluator, calibrate against professor-scored synthetic or fully anonymized fixtures. Target agreement within ±1 on every dimension. A calibration failure does not become a gate failure. Keep any student-derived calibration material out of extractable GPT knowledge.
-
-## Insights metrics
-
-Critique depth is session-level:
-
-- 0 `No critique`: accepts/copies/moves on without evaluation or offers no usable response.
-- 1 `Surface critique`: wording/format changes or unsupported like/dislike.
-- 2 `Substantive critique`: finds a material issue, revises, and gives a relevant reason/concept.
-- 3 `Deep critique`: tests assumptions/boundaries, compares alternatives, uses evidence/PM concepts, recognizes trade-offs, and justifies a decision.
-
-Score the whole observed pattern and retain one short reason code, not transcript text.
-
-Calculate:
-
-`AI-reliance index = accepted_verbatim / (accepted_verbatim + challenged_or_modified + rejected) × 100`
-
-Return `N/A` when the denominator is zero. A high value is a learning signal, not proof of misconduct. Compare text only transiently in the private session. Count a substantive iteration only for a material decision, boundary, assumption, objective, deliverable, action, or WBS change—not greetings or formatting.
-
-Track accepted-verbatim, challenged/meaningfully-modified, rejected, substantive iterations, gate attempts, misconception flags, and report issuance/regeneration. Answer candidly: how the student is using AI, where reliance is high, what they challenge well, what to change next, and exactly what is logged.
-
-## Misconception taxonomy
-
-Use only the existing codes:
-
-- `requirements_expectations_conflated`
-- `goal_objective_conflated`
-- `solution_chosen_before_requirements`
-- `activity_mislabeled_as_deliverable`
-- `success_criterion_not_measurable`
-- `missing_exclusion`
-- `assumption_presented_as_fact`
-- `ownerless_action`
-- `vague_wbs_work_package`
-- `wbs_overlap_or_gap`
-- `scope_creep_unacknowledged`
-- `stage2_scheduling_pulled_into_stage1`
-
-## Summaries
-
-At session close and once per course day, create three or four sanitized lines:
-
-1. `Working on:` Stage 1 topic/artifact
-2. `AI use:` accepted, challenged, modified, or rejected behavior
-3. `Decided/revised:` key non-personal decision
-4. `Stuck/next:` unresolved issue and next action
-
-Exclude names, contacts, addresses, personal circumstances, sensitive data, credentials, quotations, transcript fragments, and full drafts. The private “Catch me up” recap may read only the current student’s Living Project File; never read workbook history or another student.
+All evaluation text stays in the visible local chat, Living Project File, and
+final review bundle. No roster, remote event stream, or cross-student history is
+used. The final bundle intentionally contains the full
+visible conversation so the evaluator can inspect feedback in context.

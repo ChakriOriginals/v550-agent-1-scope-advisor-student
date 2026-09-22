@@ -4,8 +4,7 @@ __pycache__/
 .pytest_cache/
 .env
 .env.*
-student-key*
-telemetry-output*
+V550 Review Bundles/
 *.pdf
 *.docx
 *.xlsx

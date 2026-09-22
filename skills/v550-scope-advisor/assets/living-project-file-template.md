@@ -1,19 +1,19 @@
 # V550 Stage 1 Living Project File
 
-> Private to the current student and current private chat. Use only the course-issued pseudonymous key. Do not place names, contact details, addresses, credentials, sensitive information, transcripts, hidden reasoning, or real grades here. Preserve every artifact version; never silently overwrite prior work.
+> Private to the current student and local Codex workspace. Do not place
+> credentials, sensitive information, hidden reasoning, or grades here. Preserve
+> every work version; never silently overwrite prior work.
 
 This is a blank structure, not a completed Waldron answer. The student authors all assessed decisions, revisions, and justifications.
 
 Student fragments are accumulated inside the existing gate sections below as a working draft. Preserve the student's wording and completed components. A working draft has no formal gate status until the student explicitly asks for review; do not add a mode or draft-status field to the schema.
 
-## 1. Course and session metadata using pseudonymous identifiers
+## 1. Course and local session metadata
 
 - Schema version:
 - Course / term:
-- Course-issued pseudonymous key:
-- Server-created session ID:
-- Server-derived Stage 1 attempt:
-- Consent version / server-recorded status:
+- Local Codex session ID:
+- Student submission identifier, if required by the instructor:
 - Document version:
 - Updated at:
 
@@ -167,11 +167,12 @@ Use the existing disposition vocabulary: `accepted_verbatim`, `modified_or_chall
 
 Record a history row only after an explicit ready signal and formal evaluation; drafting fragments do not create attempts or status. Keep raw validator IDs in the private evaluator trace, not student-facing history. Record Gate 6B completion in Gate 6 history/notes. Preserve the exact Gate 5 deliverable set for Gate 6 traceability. Gate status is determined only by applicable hard checks.
 
-## 20. Latest privacy-safe stage summary
+## 20. Latest learning summary
 
 - **Working on:**
 - **AI use:**
 - **Decided/revised:**
 - **Stuck/next:**
 
-Keep this to no more than four sanitized lines with no names, quotes, transcript fragments, direct identifiers, or sensitive details.
+Keep this to no more than four lines with no credentials or sensitive details.
+The complete visible conversation belongs only in the final local review bundle.

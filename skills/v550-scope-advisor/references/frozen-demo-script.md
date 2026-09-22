@@ -175,4 +175,8 @@ The required demo passes only when:
 - DEMO-03 closes Gate 2 for the isolated `G2_COMMUNITY_ACCESS_GAP` failure; and
 - every closed response withholds the fix and ends with a bounded student action.
 
-Record DEMO-04 separately as an enhancement result. For every case, retain the fixture ID, model/runtime version, timestamp, parsed hard-check results, final gate status, withholding assertion result, and non-blocking-feedback assertion result. Do not store student-derived content or transcripts in telemetry.
+Record DEMO-04 separately as an enhancement result. For every synthetic case,
+retain the fixture ID, model/runtime version, timestamp, parsed required-item
+results, final gate status, withholding assertion result, and
+non-blocking-feedback assertion result. Do not use real student content in test
+fixtures.

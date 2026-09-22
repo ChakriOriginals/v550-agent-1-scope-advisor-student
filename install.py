@@ -38,7 +38,7 @@ def main(argv: list[str] | None = None) -> int:
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.copytree(SOURCE, destination)
     print(f"Installed v550-scope-advisor at {destination}")
-    print("No student key or endpoint was stored by the installer.")
+    print("This local-only skill requires no course credential or external service.")
     return 0
 
 

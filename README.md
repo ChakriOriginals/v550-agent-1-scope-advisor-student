@@ -1,119 +1,90 @@
-# V550 Scope Advisor — student practice package
+# V550 Scope Advisor — local student practice
 
-This private course repository installs the Stage 1 Scope Advisor as a local
-Codex skill. The advisor coaches you through six Scope of Work gates, preserves
-your draft fragments, and evaluates a gate only after you say you are ready.
-It does not write the assignment for you or assign a Canvas grade.
+This repository installs the Stage 1 Scope Advisor as a fully local Codex skill.
+Students work through the frozen **Allocating the Waldron** scenario using six
+ordered Scope of Work gates. The advisor teaches, preserves student-authored work,
+evaluates only after a ready signal, and never writes the assignment for the
+student.
 
-For complete macOS, Linux, and Windows instructions, read
-[`STUDENT_SETUP_GUIDE.md`](STUDENT_SETUP_GUIDE.md).
-
-## What you need
-
-- ChatGPT Desktop with Codex, or the Codex CLI, installed on your computer;
-- Python 3.11 or newer;
-- `curl`, included with current macOS, Windows, and most Linux systems;
-- your individual V550 student key from the instructor.
-
-Do not share your student key. It is not a password or a Canvas credential, but it
-is the revocable identifier used for this course pilot.
+There is no remote faculty service, roster lookup, course credential, or
+automatic grade connection.
 
 ## Install
 
-Clone this repository, enter its directory, and run:
+You need Git, Python 3.11 or newer, and either ChatGPT Desktop with Codex or the
+Codex CLI.
 
 ```bash
+git clone https://github.com/ChakriOriginals/v550-agent-1-scope-advisor-student.git
+cd v550-agent-1-scope-advisor-student
+python3 tools/verify_package.py
 python3 install.py
 ```
 
-The installer copies only `v550-scope-advisor` into the documented user skill
-folder at `~/.agents/skills`. ChatGPT Desktop and Codex discover it there. The
-installer never asks for or stores your student key.
+The installer copies the skill to:
 
-Verify the downloaded package before installing or updating it:
-
-```bash
-python3 tools/verify_package.py
+```text
+~/.agents/skills/v550-scope-advisor
 ```
 
 ## Start in ChatGPT Desktop on macOS
-
-Completely quit ChatGPT, then run:
 
 ```bash
 ./start-v550-desktop.sh
 ```
 
-Enter your individual key at the hidden prompt. The launcher validates the
-configuration, starts ChatGPT Desktop with the key available only to that app
-process, and does not save the key. In ChatGPT Desktop, select **Codex**, open
-this repository as a local folder, open **Skills** in the sidebar, and confirm
-**v550 Scope Advisor** is listed. Start a local Codex chat and select the skill
-by typing `$v550-scope-advisor`.
+In ChatGPT Desktop:
 
-Use this prompt:
+1. Select **Codex**.
+2. Open this repository as a local folder.
+3. Confirm **v550 Scope Advisor** appears under **Skills**.
+4. Start a new local chat and send:
 
 ```text
 Use $v550-scope-advisor to help me practice Stage 1 Scope of Work in Guided mode.
 ```
 
-If ChatGPT was already running, the launcher stops before asking for a key. Quit
-the app fully and rerun it so the new process receives the temporary credential.
+For the terminal interface, run `./start-v550.sh` and use the same prompt.
 
-## Start in Codex CLI
+## Learning flow
 
-On macOS or Linux, run:
+The advisor runs these gates in order:
 
-```bash
-./start-v550.sh
-```
+1. Big 5 Pre-Planning
+2. Requirements
+3. Expectations
+4. Goals & Objectives
+5. Scope of Work
+6. Work Breakdown Structure, including internal Gate 6B
 
-The launcher reads the instructor endpoint from `config/endpoint.txt`, privately
-prompts for your student key, validates the configuration without printing either
-value, and starts Codex with the values available only to that process. It detects
-the Codex CLI in `PATH` and in the standard ChatGPT or Codex application bundle on
-macOS.
+The student drafts first. A gate is evaluated only after the student explicitly
+asks for review. All frozen required items must pass before the gate opens.
 
-Then prompt Codex:
+## Final review bundle
+
+At completion—or when ending an incomplete session—the advisor produces a
+standardized `V550 Final Learning Review`. The student then sends:
 
 ```text
-Use $v550-scope-advisor to help me practice Stage 1 Scope of Work in Guided mode.
+Generate my review bundle
 ```
 
-The advisor explains telemetry before any write and asks for visible consent. If
-you decline, practice can continue without telemetry. The advisor logs structured
-course activity and short sanitized summaries, not transcripts, full drafts,
-personal information, sensitive details, secrets, or grades.
+The local exporter creates a read-only folder and ZIP under
+`V550 Review Bundles/`. The bundle contains:
 
-## Windows
+- a human-readable HTML review sheet;
+- the complete visible student/advisor transcript;
+- latest formal status for all six gates;
+- the advisor's final qualitative feedback;
+- a canonical JSON record and SHA-256 manifest.
 
-If you cannot use the macOS launchers, set `V550_ACTION_ENDPOINT` and
-`V550_STUDENT_KEY` in the environment that launches Codex. Do not put the key in
-the prompt, a command argument, a Git file, or a Living Project File. Ask your
-instructor or TA for local setup help if your installation does not inherit those
-environment variables.
+System/developer instructions, hidden reasoning, tool calls, and tool output are
+excluded.
 
-## Faculty dashboard
+Local permissions and hashes discourage edits and detect mismatches, but no file
+on a student-owned computer can be made truly uneditable without an
+instructor-controlled signing or submission service. The bundle states this
+limitation explicitly.
 
-Students cannot open the faculty dashboard or workbook. Successful telemetry calls
-write only minimized, pseudonymous records. Access to the Restricted workbook is
-limited to the named instructors and TAs.
-
-## Troubleshooting
-
-- `STUDENT_KEY_NOT_ALLOWED`: ask the instructor to check whether your key is active.
-- IU login page or HTML instead of JSON: the instructor endpoint is not currently
-  student-callable; continue practice locally and notify the instructor.
-- Telemetry unavailable: the advisor must not claim a dashboard write occurred.
-  Your local practice and Markdown checkpoint can continue.
-- Codex CLI not found: update to the latest ChatGPT/Codex app or install the Codex
-  CLI, then rerun the launcher. The launcher checks the standard macOS app bundle
-  even when Terminal does not include it in `PATH`.
-- Existing skill folder: move the old folder aside, then rerun `python3 install.py`.
-- Skill missing in ChatGPT Desktop: confirm it exists at
-  `~/.agents/skills/v550-scope-advisor`, then quit and reopen the app with
-  `./start-v550-desktop.sh`.
-
-Do not submit real personal, medical, financial, disciplinary, immigration,
-authentication, disability, security, or other sensitive information to the
-advisor.
+See [STUDENT_SETUP_GUIDE.md](STUDENT_SETUP_GUIDE.md) for full setup,
+troubleshooting, updating, and submission instructions.

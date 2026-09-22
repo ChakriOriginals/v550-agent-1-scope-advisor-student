@@ -1,47 +1,49 @@
-# Local Student Installation and Telemetry
+# Local Student Installation
 
-Use this reference when the Scope Advisor runs as an installed Codex skill rather
-than as an IU Custom GPT. A local Codex skill does not inherit Custom GPT Actions,
-so the bundled client is the only approved local telemetry transport.
+The V550 Scope Advisor runs entirely inside the student's local Codex workspace.
+It requires no remote course service, credential, roster lookup, or faculty data
+store.
 
-## Local configuration
+## Install and launch
 
-The student sets two environment variables in the terminal session that launches
-Codex:
-
-- `V550_ACTION_ENDPOINT`: the instructor-published Apps Script web-app URL;
-- `V550_STUDENT_KEY`: the student's individual high-entropy course key.
-
-Never ask the student to paste either value into chat. Never place either value in
-Git, a Living Project File, a request JSON file, a command argument, telemetry, or
-diagnostic output. The key is the sole client credential; there is no PIN and no
-`classToken`.
-
-Validate configuration without displaying either value:
+From the cloned course repository:
 
 ```bash
-python "$HOME/.agents/skills/v550-scope-advisor/scripts/local_telemetry_client.py" --check-config
+python3 tools/verify_package.py
+python3 install.py
+./start-v550-desktop.sh
 ```
 
-## Calling an operation
+In ChatGPT Desktop, select Codex, open the cloned repository as a local folder,
+start a new chat, and invoke:
 
-After visible consent, prepare only the schema-valid, transcript-free JSON fields
-for the operation. Omit `studentKey`; the client injects it from the environment.
-Send the JSON on standard input to one of the four operation names:
-
-```bash
-python "$HOME/.agents/skills/v550-scope-advisor/scripts/local_telemetry_client.py" startSession
-python "$HOME/.agents/skills/v550-scope-advisor/scripts/local_telemetry_client.py" logEvent
-python "$HOME/.agents/skills/v550-scope-advisor/scripts/local_telemetry_client.py" closeSession
-python "$HOME/.agents/skills/v550-scope-advisor/scripts/local_telemetry_client.py" issueReport
+```text
+Use $v550-scope-advisor to help me practice Stage 1 Scope of Work in Guided mode.
 ```
 
-Write the JSON through standard input, not a command argument. The helper accepts
-only an HTTPS `script.google.com` deployment URL, injects only `studentKey`, rejects
-`classToken`, follows TLS-verified redirects, caps request/response size, rejects a
-credential echo, and prints only the server's JSON response.
+For the terminal interface, use `./start-v550.sh` and the same prompt.
 
-If configuration, transport, or the server fails, do not claim that a write
-occurred. Preserve the student's local draft, explain that practice can continue
-without telemetry, and offer a retry or instructor handoff. Never fabricate a
-session ID, acknowledgement, report receipt, or dashboard write.
+## Local files
+
+- The installed skill lives at `~/.agents/skills/v550-scope-advisor`.
+- The Living Project File stays in the current student's local workspace.
+- Review bundles are written under `V550 Review Bundles/` in that workspace and
+  are ignored by Git.
+- Codex maintains its ordinary local session history under the user's Codex data
+  directory. The review exporter reads only the current workspace's visible
+  student/advisor messages.
+
+No course conversation or review bundle is automatically sent to an instructor.
+The student submits the generated ZIP using the instructor's chosen course
+submission method.
+
+## Session closeout
+
+After the advisor displays `## V550 Final Learning Review`, the student sends:
+
+```text
+Generate my review bundle
+```
+
+The advisor runs the bundled local exporter and returns the ZIP path. Read
+`local-review-bundles.md` for the exact contents and integrity boundary.

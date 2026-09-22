@@ -16,13 +16,22 @@ REQUIRED = (
     ROOT / "install.py",
     ROOT / "start-v550.sh",
     ROOT / "start-v550-desktop.sh",
-    ROOT / "config" / "endpoint.txt",
     ROOT / "skills" / "v550-scope-advisor" / "SKILL.md",
     ROOT
     / "skills"
     / "v550-scope-advisor"
     / "scripts"
-    / "local_telemetry_client.py",
+    / "generate_review_bundle.py",
+    ROOT
+    / "skills"
+    / "v550-scope-advisor"
+    / "scripts"
+    / "verify_review_bundle.py",
+    ROOT
+    / "skills"
+    / "v550-scope-advisor"
+    / "scripts"
+    / "validate_frozen_gate_submission.py",
 )
 FORBIDDEN_PARTS = {
     "source-material",
@@ -37,6 +46,17 @@ SECRET_VALUE_PATTERNS = (
     re.compile(r"v550_ct_[A-Za-z0-9_-]{32,}"),
     re.compile(r"V550_[A-Za-z0-9_-]{24,}"),
     re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----"),
+)
+REMOVED_RUNTIME_MARKERS = (
+    "V550_ACTION_ENDPOINT",
+    "V550_STUDENT_KEY",
+    "CLASS_DEPLOYMENT_TOKEN",
+    "ACTIVE_STUDENT_KEYS_JSON",
+    "REPORT_HMAC_SECRET",
+    "script.google.com/macros/s/",
+    "local_telemetry_client.py",
+    "validate_telemetry_payload.py",
+    "validate_report_integrity.py",
 )
 
 
@@ -64,6 +84,10 @@ def main() -> int:
             for pattern in SECRET_VALUE_PATTERNS:
                 if pattern.search(text):
                     errors.append(f"possible credential value in: {relative}")
+            if path.resolve() != Path(__file__).resolve():
+                for marker in REMOVED_RUNTIME_MARKERS:
+                    if marker in text:
+                        errors.append(f"removed remote runtime marker {marker!r} in: {relative}")
 
     for script in ROOT.rglob("*.py"):
         if ".git" not in script.parts:

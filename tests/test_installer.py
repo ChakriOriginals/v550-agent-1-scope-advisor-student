@@ -28,8 +28,22 @@ class InstallerTests(unittest.TestCase):
                 check=False,
             )
             installed_skill = skill_root / "v550-scope-advisor" / "SKILL.md"
+            installed_generator = (
+                skill_root
+                / "v550-scope-advisor"
+                / "scripts"
+                / "generate_review_bundle.py"
+            )
+            installed_verifier = (
+                skill_root
+                / "v550-scope-advisor"
+                / "scripts"
+                / "verify_review_bundle.py"
+            )
             self.assertEqual(completed.returncode, 0, completed.stderr)
             self.assertTrue(installed_skill.is_file())
+            self.assertTrue(installed_generator.is_file())
+            self.assertTrue(installed_verifier.is_file())
             self.assertIn(str(skill_root / "v550-scope-advisor"), completed.stdout)
 
 

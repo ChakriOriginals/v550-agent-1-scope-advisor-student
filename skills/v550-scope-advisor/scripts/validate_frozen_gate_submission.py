@@ -72,9 +72,9 @@ SOURCE_CHALLENGE_RE = re.compile(
 )
 INJECTION_RE = re.compile(
     r"(?:ignore\s+(?:all\s+)?(?:previous|prior)\s+instructions|reveal\s+(?:the\s+)?(?:hidden|system|developer)\s+(?:prompt|instructions)|"
-    r"force\s+(?:gate\s*)?open|change\s+(?:the\s+)?student\s+key|new\s+rubric|"
+    r"force\s+(?:gate\s*)?open|new\s+rubric|"
     r"\b(?:system|administrator|admin|instructor|test)\s*:\s*.*(?:override|ignore|open|bypass)|"
-    r"(?:appeal|override)\s+pin|skip\s+gate|enable\s+test\s+mode)",
+    r"skip\s+gate|enable\s+test\s+mode)",
     re.I | re.S,
 )
 
@@ -329,7 +329,7 @@ def deployment_configuration_error(message: str) -> dict[str, Any]:
         "errors": [{"code": "TEST_MODE_CONFIGURATION", "message": message}],
         "student_response": {
             "acknowledgment": "This advisor is temporarily unavailable because its deployment safety check failed.",
-            "progress": "No student work, telemetry, gate result, or report was changed.",
+            "progress": "No student work, gate result, or review record was changed.",
             "next": "Please ask the instructor to verify the test-environment configuration.",
         },
     }
@@ -686,7 +686,7 @@ def interrupted_result(kind: str, gate_number: int, submission: dict[str, Any]) 
         "interaction_state": kind,
         "attempt_recorded": False,
         "assembled_submission": submission,
-        "telemetry_note": note,
+        "local_note": note,
         "student_response": response,
     }
 
@@ -1292,7 +1292,7 @@ def _next_formal_move(gate_number: int, failed: list[dict[str, Any]], status: st
         return (
             "Carry the preserved answer into the next gate when you are ready."
             if gate_number < 6
-            else "Use the course submission process when the authorized report becomes available."
+            else "Ask for the final learning review, then generate the local review bundle."
         )
     first = failed[0]["code"]
     questions = {
@@ -1494,7 +1494,7 @@ def validate(envelope: Any) -> dict[str, Any]:
     if status == "CLOSED":
         next_move = "Review the required item(s) that need attention and revise only your own answer."
     else:
-        next_move = "Carry your approved work forward and submit your own attempt at the next gate." if gate_raw < 6 else "Submit the issued Stage 1 report through the course process when the backend makes it available."
+        next_move = "Carry your approved work forward and submit your own attempt at the next gate." if gate_raw < 6 else "Ask for the final learning review, then generate the local review bundle."
     student_response = _formal_student_response(gate_raw, hard_checks, criteria, cross, status)
     if gate_raw == 1 and status == "CLOSED" and any(
         item["code"] in {"G1_COMPARISON_EXAMPLE", "G1_COMPARISON_LESSON"}

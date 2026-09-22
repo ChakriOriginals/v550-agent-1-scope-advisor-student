@@ -1,9 +1,8 @@
-"""Regression tests for the macOS/Linux V550 launcher."""
+"""Regression tests for the local V550 launchers."""
 
 from __future__ import annotations
 
 import os
-import shutil
 import stat
 import subprocess
 import tempfile
@@ -12,175 +11,82 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-LAUNCHER = ROOT / "start-v550.sh"
+CLI_LAUNCHER = ROOT / "start-v550.sh"
 DESKTOP_LAUNCHER = ROOT / "start-v550-desktop.sh"
-CLIENT = ROOT / "skills" / "v550-scope-advisor" / "scripts" / "local_telemetry_client.py"
-ENDPOINT = (ROOT / "config" / "endpoint.txt").read_text(encoding="utf-8").strip()
 
 
-class StartV550LauncherTests(unittest.TestCase):
-    def test_shell_syntax_and_bundled_app_fallback(self) -> None:
-        completed = subprocess.run(
-            ["sh", "-n", str(LAUNCHER)], capture_output=True, text=True, check=False
-        )
-        self.assertEqual(completed.returncode, 0, completed.stderr)
-        source = LAUNCHER.read_text(encoding="utf-8")
-        self.assertIn("/Applications/ChatGPT.app/Contents/Resources/codex", source)
-        self.assertIn("/Applications/Codex.app/Contents/Resources/codex", source)
-        self.assertLess(
-            source.index("if ! codex_cli=$(resolve_codex_cli)"),
-            source.index("V550 student key (input hidden)"),
-        )
+class LauncherTests(unittest.TestCase):
+    def test_shell_syntax(self) -> None:
+        for launcher in (CLI_LAUNCHER, DESKTOP_LAUNCHER):
+            with self.subTest(launcher=launcher.name):
+                completed = subprocess.run(
+                    ["sh", "-n", str(launcher)], capture_output=True, text=True, check=False
+                )
+                self.assertEqual(completed.returncode, 0, completed.stderr)
 
-    def test_cli_diagnostic_does_not_request_a_student_key(self) -> None:
+    def test_cli_diagnostic_requires_no_course_credential(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             fake_cli = Path(temporary) / "codex"
             fake_cli.write_text("#!/bin/sh\nexit 0\n", encoding="utf-8")
             fake_cli.chmod(fake_cli.stat().st_mode | stat.S_IXUSR)
             environment = os.environ.copy()
-            environment.pop("V550_STUDENT_KEY", None)
             environment["V550_CODEX_CLI"] = str(fake_cli)
             completed = subprocess.run(
-                [str(LAUNCHER), "--check-cli"],
+                [str(CLI_LAUNCHER), "--check-cli"],
                 cwd=ROOT,
                 env=environment,
                 capture_output=True,
                 text=True,
                 check=False,
             )
-        rendered = completed.stdout + completed.stderr
-        self.assertEqual(completed.returncode, 0, rendered)
-        self.assertIn("Codex CLI detected.", rendered)
-        self.assertNotIn("V550 student key", rendered)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertIn("Codex CLI detected.", completed.stdout)
 
-    def test_explicit_cli_runs_with_preconfigured_key_without_echoing_it(self) -> None:
-        synthetic_key = "V550_" + "SYNTH_LAUNCHER_TEST_" + "1234567890"
+    def test_cli_launcher_starts_in_repository_without_remote_configuration(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
-            temp = Path(temporary)
-            codex_home = temp / "codex-home"
-            client_target = (
-                codex_home
-                / "skills"
-                / "v550-scope-advisor"
-                / "scripts"
-                / "local_telemetry_client.py"
-            )
-            client_target.parent.mkdir(parents=True)
-            shutil.copy2(CLIENT, client_target)
-
-            fake_cli = temp / "codex"
+            fake_cli = Path(temporary) / "codex"
             fake_cli.write_text(
                 "#!/bin/sh\n"
-                f"[ \"${{V550_STUDENT_KEY:-}}\" = \"{synthetic_key}\" ] || exit 41\n"
-                f"[ \"${{V550_ACTION_ENDPOINT:-}}\" = \"{ENDPOINT}\" ] || exit 42\n"
-                "printf 'FAKE_CODEX_STARTED\\n'\n",
+                f"[ \"$PWD\" = \"{ROOT}\" ] || exit 41\n"
+                "printf 'LOCAL_CODEX_STARTED\\n'\n",
                 encoding="utf-8",
             )
             fake_cli.chmod(fake_cli.stat().st_mode | stat.S_IXUSR)
-
             environment = os.environ.copy()
-            environment.update(
-                {
-                    "HOME": str(temp),
-                    "CODEX_HOME": str(codex_home),
-                    "V550_CODEX_CLI": str(fake_cli),
-                    "V550_STUDENT_KEY": synthetic_key,
-                }
-            )
+            environment["V550_CODEX_CLI"] = str(fake_cli)
             completed = subprocess.run(
-                [str(LAUNCHER)],
-                cwd=ROOT,
+                [str(CLI_LAUNCHER)],
+                cwd=ROOT.parent,
                 env=environment,
                 capture_output=True,
                 text=True,
                 check=False,
             )
-
-        rendered = completed.stdout + completed.stderr
-        self.assertEqual(completed.returncode, 0, rendered)
-        self.assertIn("FAKE_CODEX_STARTED", rendered)
-        self.assertIn('"studentKeyPresent": true', rendered)
-        self.assertNotIn(synthetic_key, rendered)
-
-    def test_invalid_cli_override_fails_before_requesting_a_key(self) -> None:
-        environment = os.environ.copy()
-        environment.pop("V550_STUDENT_KEY", None)
-        environment["V550_CODEX_CLI"] = "/missing/v550/codex"
-        completed = subprocess.run(
-            [str(LAUNCHER)],
-            cwd=ROOT,
-            env=environment,
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        rendered = completed.stdout + completed.stderr
-        self.assertEqual(completed.returncode, 2, rendered)
-        self.assertIn("does not point to an executable", rendered)
-        self.assertNotIn("V550 student key (input hidden)", rendered)
-
-    def test_desktop_launcher_syntax_and_standard_app_location(self) -> None:
-        completed = subprocess.run(
-            ["sh", "-n", str(DESKTOP_LAUNCHER)],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
         self.assertEqual(completed.returncode, 0, completed.stderr)
-        source = DESKTOP_LAUNCHER.read_text(encoding="utf-8")
-        self.assertIn("/Applications/ChatGPT.app/Contents/MacOS/ChatGPT", source)
-        self.assertLess(
-            source.index("if ! desktop_executable=$(resolve_desktop_executable)"),
-            source.index("V550 student key (input hidden)"),
-        )
+        self.assertIn("LOCAL_CODEX_STARTED", completed.stdout)
 
-    def test_desktop_launcher_passes_temporary_credentials_without_echoing(self) -> None:
-        synthetic_key = "V550_" + "SYNTH_DESKTOP_TEST_" + "1234567890"
+    def test_desktop_launcher_starts_without_course_credential(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
-            temp = Path(temporary)
-            client_target = (
-                temp
-                / ".agents"
-                / "skills"
-                / "v550-scope-advisor"
-                / "scripts"
-                / "local_telemetry_client.py"
-            )
-            client_target.parent.mkdir(parents=True)
-            shutil.copy2(CLIENT, client_target)
-
-            fake_desktop = temp / "ChatGPT"
-            fake_desktop.write_text(
+            fake_app = Path(temporary) / "ChatGPT"
+            fake_app.write_text(
                 "#!/bin/sh\n"
-                f"[ \"${{V550_STUDENT_KEY:-}}\" = \"{synthetic_key}\" ] || exit 51\n"
-                f"[ \"${{V550_ACTION_ENDPOINT:-}}\" = \"{ENDPOINT}\" ] || exit 52\n"
-                "printf 'FAKE_DESKTOP_STARTED\\n'\n",
+                f"[ \"$PWD\" = \"{ROOT}\" ] || exit 51\n"
+                "printf 'LOCAL_DESKTOP_STARTED\\n'\n",
                 encoding="utf-8",
             )
-            fake_desktop.chmod(fake_desktop.stat().st_mode | stat.S_IXUSR)
-
+            fake_app.chmod(fake_app.stat().st_mode | stat.S_IXUSR)
             environment = os.environ.copy()
-            environment.update(
-                {
-                    "HOME": str(temp),
-                    "V550_CHATGPT_EXECUTABLE": str(fake_desktop),
-                    "V550_STUDENT_KEY": synthetic_key,
-                }
-            )
+            environment["V550_CHATGPT_EXECUTABLE"] = str(fake_app)
             completed = subprocess.run(
                 [str(DESKTOP_LAUNCHER)],
-                cwd=ROOT,
+                cwd=ROOT.parent,
                 env=environment,
                 capture_output=True,
                 text=True,
                 check=False,
             )
-
-        rendered = completed.stdout + completed.stderr
-        self.assertEqual(completed.returncode, 0, rendered)
-        self.assertIn("FAKE_DESKTOP_STARTED", rendered)
-        self.assertIn('"studentKeyPresent": true', rendered)
-        self.assertNotIn(synthetic_key, rendered)
+        self.assertEqual(completed.returncode, 0, completed.stderr)
+        self.assertIn("LOCAL_DESKTOP_STARTED", completed.stdout)
 
 
 if __name__ == "__main__":

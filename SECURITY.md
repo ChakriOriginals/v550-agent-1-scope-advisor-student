@@ -1,17 +1,22 @@
 # Security and privacy
 
-Report a lost or shared student key to the instructor or TA so it can be revoked
-and replaced. Do not open a public issue containing a key, student work, personal
-information, telemetry output, or a report capability.
+The student package is local-only. It contains no remote course integration,
+roster, course credential, signing secret, or instructor storage code.
 
-This repository must never contain:
+Do not commit or open a public issue containing:
 
-- student names, email addresses, roster files, or key mappings;
-- Apps Script properties, report signing keys, cookies, or access tokens;
-- transcripts, drafts, submitted reports, or faculty dashboard exports;
-- instructor-only source documents, calibration fixtures, or backend storage code.
+- student conversations, Living Project Files, or generated review bundles;
+- names, email addresses, roster exports, or grades;
+- passwords, cookies, access tokens, or other credentials;
+- instructor-only source documents or calibration material.
 
-The local telemetry client accepts only the instructor's HTTPS Apps Script web-app
-endpoint and sends the student key through request standard input, never as a
-process argument. Faculty storage remains Restricted even though the write-only
-Action endpoint must be internet-reachable.
+Generated `V550 Review Bundles/` are ignored by Git. They intentionally include
+the complete visible student/advisor conversation for evaluation, so students
+must avoid entering sensitive personal, medical, financial, disciplinary,
+immigration, disability, employment, or security information.
+
+The generated files are marked read-only and protected by included SHA-256
+values. These controls detect mismatches but do not provide authenticated
+authorship: the student owns the local computer and can change local files and
+permissions. An instructor-controlled signing or submission service would be
+required for cryptographic non-editability.
